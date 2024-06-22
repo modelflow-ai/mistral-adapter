@@ -11,27 +11,24 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace ModelflowAi\MistralAdapter\Model;
+namespace ModelflowAi\MistralAdapter\Chat;
 
-use ModelflowAi\Core\Model\AIModelAdapterInterface;
-use ModelflowAi\Core\Request\AIChatRequest;
-use ModelflowAi\Core\Request\AIRequestInterface;
-use ModelflowAi\Core\Request\Message\AIChatMessageRoleEnum;
-use ModelflowAi\Core\Response\AIChatResponse;
-use ModelflowAi\Core\Response\AIChatResponseMessage;
-use ModelflowAi\Core\Response\AIChatResponseStream;
-use ModelflowAi\Core\Response\AIChatToolCall;
-use ModelflowAi\Core\Response\AIResponseInterface;
-use ModelflowAi\Core\ToolInfo\ToolChoiceEnum;
-use ModelflowAi\Core\ToolInfo\ToolTypeEnum;
+use ModelflowAi\Chat\Adapter\AIChatAdapterInterface;
+use ModelflowAi\Chat\Request\AIChatRequest;
+use ModelflowAi\Chat\Request\Message\AIChatMessageRoleEnum;
+use ModelflowAi\Chat\Response\AIChatResponse;
+use ModelflowAi\Chat\Response\AIChatResponseMessage;
+use ModelflowAi\Chat\Response\AIChatResponseStream;
+use ModelflowAi\Chat\Response\AIChatToolCall;
+use ModelflowAi\Chat\ToolInfo\ToolChoiceEnum;
+use ModelflowAi\Chat\ToolInfo\ToolTypeEnum;
 use ModelflowAi\Mistral\ClientInterface;
 use ModelflowAi\Mistral\Model;
 use ModelflowAi\Mistral\Responses\Chat\CreateResponseToolCall;
 use ModelflowAi\Mistral\Responses\Chat\CreateStreamedResponse;
-use ModelflowAi\MistralAdapter\Tool\ToolFormatter;
 use Webmozart\Assert\Assert;
 
-final readonly class MistralChatModelAdapter implements AIModelAdapterInterface
+final readonly class MistralChatAdapter implements AIChatAdapterInterface
 {
     public function __construct(
         private ClientInterface $client,
@@ -39,10 +36,8 @@ final readonly class MistralChatModelAdapter implements AIModelAdapterInterface
     ) {
     }
 
-    public function handleRequest(AIRequestInterface $request): AIResponseInterface
+    public function handleRequest(AIChatRequest $request): AIChatResponse
     {
-        Assert::isInstanceOf($request, AIChatRequest::class);
-
         $parameters = [
             'model' => $this->model->value,
             'messages' => $request->getMessages()->toArray(),
